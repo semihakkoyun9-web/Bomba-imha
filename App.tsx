@@ -51,7 +51,7 @@ const App: React.FC = () => {
            </button>
            <div className="flex gap-4">
              <a 
-               href="https://ai.studio/apps/drive/1W_KfgqnIeI72TesoEZPmVBtbN9KRdLE8" 
+               href="https://sherlock-two.vercel.app/" 
                target="_blank" 
                rel="noopener noreferrer"
                className="flex flex-col items-center gap-1 group"
