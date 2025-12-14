@@ -58,7 +58,7 @@ const LevelSelect: React.FC<LevelSelectProps> = ({ userProfile, onSelectLevel, o
                <div className="text-6xl mb-4">🔒</div>
                <h2 className="text-2xl font-bold text-red-500">ERİŞİM REDDEDİLDİ</h2>
                <p className="text-gray-400">Bu dosya klasörüne erişim yetkiniz yok.</p>
-               <p className="text-gray-500 text-xs mt-2">MARKET > DOSYALAR sekmesinden yetki satın alın.</p>
+               <p className="text-gray-500 text-xs mt-2">MARKET  DOSYALAR sekmesinden yetki satın alın.</p>
             </div>
          ) : (
            <div className="bg-black/60 border border-white/10 rounded-sm shadow-2xl backdrop-blur-sm max-w-5xl mx-auto">
