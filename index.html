@@ -3,68 +3,117 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bomba İmha Protokolü</title>
+    <title>Bomba İmha Protokolü | v5.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
       body {
         font-family: 'Chakra Petch', sans-serif;
-        background-color: #0f172a;
+        background-color: #020617;
         color: #e2e8f0;
-        overflow-x: hidden;
+        overflow: hidden;
         user-select: none;
       }
-      .digital-font {
-        font-family: 'VT323', monospace;
-      }
+      .mono { font-family: 'Share Tech Mono', monospace; }
+      
       .scanline {
         background: linear-gradient(
           to bottom,
-          rgba(255,255,255,0),
-          rgba(255,255,255,0) 50%,
-          rgba(0,0,0,0.2) 50%,
-          rgba(0,0,0,0.2)
+          rgba(255,255,255,0) 0%,
+          rgba(255,255,255,0.03) 50%,
+          rgba(0,0,0,0.1) 50%,
+          rgba(0,0,0,0) 100%
         );
         background-size: 100% 4px;
         position: absolute;
-        top: 0; 
-        left: 0;
-        right: 0; 
-        bottom: 0;
+        top: 0; left: 0; right: 0; bottom: 0;
         pointer-events: none;
-        z-index: 10;
+        z-index: 100;
+        animation: scanlineMove 10s linear infinite;
       }
 
-      /* Developer Mode Red Glow - Reduced Intensity */
-      .dev-glow {
-        position: fixed;
-        inset: 0;
-        box-shadow: inset 0 0 150px rgba(255, 0, 0, 0.2);
-        pointer-events: none;
-        z-index: 9999;
-        animation: pulse-glow 4s infinite;
+      @keyframes scanlineMove {
+        from { background-position: 0 0; }
+        to { background-position: 0 100%; }
       }
 
-      @keyframes pulse-glow {
-        0% { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.1); }
-        50% { box-shadow: inset 0 0 100px rgba(255, 0, 0, 0.3); }
-        100% { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.1); }
+      /* Holographic HUD Frame */
+      .hud-frame {
+        position: relative;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.1);
+      }
+      .hud-corner {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        border: 2px solid #3b82f6;
+      }
+      .corner-tl { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+      .corner-tr { top: -2px; right: -2px; border-left: 0; border-bottom: 0; }
+      .corner-bl { bottom: -2px; left: -2px; border-right: 0; border-top: 0; }
+      .corner-br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+
+      /* Removed Pink/Green Glitch, Added Subtle Pulse */
+      .hud-title {
+        color: #fff;
+        text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 20px rgba(59, 130, 246, 0.5);
+        letter-spacing: -0.05em;
+        animation: subtlePulse 4s ease-in-out infinite;
       }
 
-      /* Shake Animation - Finite Loop */
+      @keyframes subtlePulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.9; transform: scale(0.99); }
+      }
+
+      /* Cyber Clouds */
+      .cloud-bg {
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 50% 50%, rgba(30, 58, 138, 0.1) 0%, transparent 50%);
+        animation: drift 30s linear infinite;
+        z-index: 1;
+      }
+
+      @keyframes drift {
+        from { transform: translate(-25%, -25%) rotate(0deg); }
+        to { transform: translate(-25%, -25%) rotate(360deg); }
+      }
+
+      .btn-cyber {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .btn-cyber::after {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: 0.5s;
+      }
+      .btn-cyber:hover::after {
+        left: 100%;
+      }
+
       .shake-screen {
         animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        animation-iteration-count: 6; /* Shakes for about 3 seconds then stops */
-        transform: translate3d(0, 0, 0);
-        backface-visibility: hidden;
+        animation-iteration-count: 6;
       }
 
       @keyframes shake {
-        10%, 90% { transform: translate3d(-4px, 0, 0); }
-        20%, 80% { transform: translate3d(6px, 0, 0); }
-        30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
-        40%, 60% { transform: translate3d(8px, 0, 0); }
+        10%, 90% { transform: translate3d(-2px, 0, 0); }
+        20%, 80% { transform: translate3d(3px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+        40%, 60% { transform: translate3d(5px, 0, 0); }
       }
+
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f644; border-radius: 10px; }
     </style>
   <script type="importmap">
 {
@@ -72,7 +121,7 @@
     "react": "https://esm.sh/react@^19.2.3",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "react/": "https://esm.sh/react@^19.2.3/",
-    "vite": "https://esm.sh/vite@^7.2.7",
+    "vite": "https://esm.sh/vite@^7.3.0",
     "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2"
   }
 }

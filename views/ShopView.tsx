@@ -3,18 +3,14 @@ import { UserProfile, Theme } from '../types';
 import { saveProfile } from '../utils';
 
 export const THEMES: Theme[] = [
-  { id: 'default', name: 'Standart', price: 0, bgClass: 'bg-slate-900', panelClass: 'bg-zinc-400', accentClass: 'border-zinc-500', fontClass: 'text-white' },
+  { id: 'default', name: 'Standart', price: 0, bgClass: 'bg-slate-950', panelClass: 'bg-zinc-400', accentClass: 'border-zinc-500', fontClass: 'text-white' },
   { id: 'matrix', name: 'Matrix', price: 500, bgClass: 'bg-black', panelClass: 'bg-black text-green-500', accentClass: 'border-green-500', fontClass: 'text-green-500' },
-  { id: 'cyber', name: 'Cyberpunk', price: 1200, bgClass: 'bg-purple-900', panelClass: 'bg-indigo-900', accentClass: 'border-pink-500', fontClass: 'text-pink-400' },
-  { id: 'rust', name: 'Paslı Metal', price: 2000, bgClass: 'bg-orange-950', panelClass: 'bg-stone-600', accentClass: 'border-orange-800', fontClass: 'text-orange-200' },
-  { id: 'military', name: 'Askeri', price: 2500, bgClass: 'bg-stone-800', panelClass: 'bg-stone-700', accentClass: 'border-green-800', fontClass: 'text-green-100' },
-  { id: 'ocean', name: 'Okyanus', price: 3000, bgClass: 'bg-cyan-950', panelClass: 'bg-sky-800', accentClass: 'border-cyan-400', fontClass: 'text-cyan-200' },
-  { id: 'neon', name: 'Neon City', price: 3500, bgClass: 'bg-slate-900', panelClass: 'bg-slate-800', accentClass: 'border-cyan-400', fontClass: 'text-cyan-300' },
-  { id: 'hacker', name: 'Hacker Green', price: 4000, bgClass: 'bg-green-950', panelClass: 'bg-black', accentClass: 'border-green-600', fontClass: 'text-green-500' },
-  { id: 'retro', name: 'Retro Wave', price: 4200, bgClass: 'bg-indigo-950', panelClass: 'bg-fuchsia-900', accentClass: 'border-yellow-400', fontClass: 'text-yellow-300' },
-  { id: 'blood', name: 'Blood Red', price: 4500, bgClass: 'bg-red-950', panelClass: 'bg-zinc-900', accentClass: 'border-red-600', fontClass: 'text-red-600' },
-  { id: 'monochrome', name: 'Siyah Beyaz', price: 4800, bgClass: 'bg-gray-100', panelClass: 'bg-white', accentClass: 'border-black text-black', fontClass: 'text-black' },
-  { id: 'gold', name: 'Altın Kaplama', price: 5000, bgClass: 'bg-yellow-950', panelClass: 'bg-yellow-600', accentClass: 'border-yellow-300', fontClass: 'text-yellow-100' },
+  { id: 'cyber', name: 'Cyberpunk', price: 1200, bgClass: 'bg-indigo-950', panelClass: 'bg-indigo-900', accentClass: 'border-pink-500', fontClass: 'text-pink-400' },
+  { id: 'mars', name: 'Mars Kolonisi', price: 1800, bgClass: 'bg-orange-950', panelClass: 'bg-orange-900', accentClass: 'border-orange-500', fontClass: 'text-orange-300' },
+  { id: 'stealth', name: 'Hayalet (Stealth)', price: 2200, bgClass: 'bg-zinc-950', panelClass: 'bg-zinc-900', accentClass: 'border-zinc-700', fontClass: 'text-zinc-400' },
+  { id: 'undersea', name: 'Derin Deniz', price: 2800, bgClass: 'bg-teal-950', panelClass: 'bg-teal-900', accentClass: 'border-teal-500', fontClass: 'text-teal-300' },
+  { id: 'neon', name: 'Neon City', price: 3500, bgClass: 'bg-slate-950', panelClass: 'bg-slate-900', accentClass: 'border-cyan-400', fontClass: 'text-cyan-400' },
+  { id: 'gold', name: 'Altın Kaplama', price: 5000, bgClass: 'bg-yellow-950', panelClass: 'bg-yellow-700', accentClass: 'border-yellow-300', fontClass: 'text-yellow-100' },
 ];
 
 interface ShopProps {
@@ -56,10 +52,9 @@ const ShopView: React.FC<ShopProps> = ({ userProfile, setUserProfile, onBack }) 
 
   const buyMoney = (amount: number, cost: string) => {
      if(userProfile.isDevMode) {
-         setMessage("Geliştirici modundasınız, zaten zenginsiniz!");
+         setMessage("Geliştirici modundasınız!");
          return;
      }
-     // Simulating In-App Purchase
      const confirm = window.confirm(`${cost} karşılığında $${amount} satın almak istiyor musunuz? (Simülasyon)`);
      if(confirm) {
         const newProfile = { ...userProfile, money: userProfile.money + amount };
@@ -69,70 +64,58 @@ const ShopView: React.FC<ShopProps> = ({ userProfile, setUserProfile, onBack }) 
 
   const redeemCode = () => {
     if (promoCode === 'DEVMODE' || promoCode === 'SEMIHBABA') {
-      const newProfile = { 
-          ...userProfile, 
-          isDevMode: true, 
-          prevMoney: userProfile.money, // Save current balance
-          money: 999999999 // Functional infinite
-      };
-      setUserProfile(newProfile); saveProfile(newProfile); setMessage(promoCode === 'SEMIHBABA' ? "Semih Baba Modu Aktif!" : "Geliştirici Modu Aktif!");
+      const newProfile = { ...userProfile, isDevMode: true, prevMoney: userProfile.money, money: 9999999 };
+      setUserProfile(newProfile); saveProfile(newProfile); setMessage("Geliştirici Yetkisi Tanımlandı!");
     } else if (promoCode === 'BOMBA2025') {
        const newProfile = { ...userProfile, money: userProfile.money + 5000 };
-       setUserProfile(newProfile); saveProfile(newProfile); setMessage("Promosyon Kodu Kabul Edildi!");
+       setUserProfile(newProfile); saveProfile(newProfile); setMessage("Hediye Kodu Kabul Edildi!");
     } else {
       setMessage("Geçersiz Kod");
     }
   };
 
-  const handleExitDevMode = () => {
-    // Restore previous balance
-    const restoredMoney = userProfile.prevMoney !== undefined ? userProfile.prevMoney : 0;
-    const newProfile = { 
-        ...userProfile, 
-        isDevMode: false,
-        money: restoredMoney
-    };
-    setUserProfile(newProfile);
-    saveProfile(newProfile);
-    setMessage("Geliştirici Modu Kapatıldı. Bakiye geri yüklendi.");
-  };
-
   return (
-    <div className="h-full flex flex-col text-white">
-       <div className="bg-black/40 p-4 border-b border-white/10 flex justify-between items-center z-20">
-         <button onClick={onBack} className="text-xl font-bold hover:text-yellow-500">&larr; GERİ</button>
+    <div className="h-full flex flex-col text-white font-mono animate-[fadeIn_0.5s_ease-out]">
+       <div className="bg-black/60 backdrop-blur-2xl p-6 border-b border-white/10 flex justify-between items-center z-20">
+         <button onClick={onBack} className="text-2xl font-black hover:text-yellow-500 tracking-tighter transition-all flex items-center gap-3">
+           <span className="text-yellow-500">&larr;</span> MERKEZ
+         </button>
          <div className="text-right">
-            <div className="text-xs text-gray-400">BAKİYE</div>
-            <div className="text-2xl font-mono text-green-400">
-                {userProfile.isDevMode ? <span className="text-4xl">∞</span> : `$${userProfile.money}`}
+            <div className="text-[10px] text-gray-500 tracking-widest font-bold uppercase">Mevcut Fon</div>
+            <div className="text-3xl font-black text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">
+                {userProfile.isDevMode ? <span className="text-4xl animate-pulse">SINIRSIZ</span> : `$${userProfile.money}`}
             </div>
          </div>
        </div>
 
-       <div className="flex border-b border-white/10 bg-black/20 z-20">
-         <button onClick={() => setActiveTab('themes')} className={`flex-1 py-4 font-bold ${activeTab === 'themes' ? 'text-yellow-500 border-b-2 border-yellow-500' : 'text-gray-400'}`}>TEMALAR</button>
-         <button onClick={() => setActiveTab('files')} className={`flex-1 py-4 font-bold ${activeTab === 'files' ? 'text-blue-500 border-b-2 border-blue-500' : 'text-gray-400'}`}>ÖZEL DOSYALAR</button>
-         <button onClick={() => setActiveTab('bank')} className={`flex-1 py-4 font-bold ${activeTab === 'bank' ? 'text-green-500 border-b-2 border-green-500' : 'text-gray-400'}`}>BANKA</button>
+       <div className="flex border-b border-white/10 bg-black/40 z-20 backdrop-blur-md">
+         <button onClick={() => setActiveTab('themes')} className={`flex-1 py-6 font-black text-xs tracking-[0.3em] transition-all uppercase ${activeTab === 'themes' ? 'text-yellow-500 bg-white/5 shadow-[inset_0_-3px_0_#eab308]' : 'text-gray-500 hover:text-gray-300'}`}>Görünümler</button>
+         <button onClick={() => setActiveTab('files')} className={`flex-1 py-6 font-black text-xs tracking-[0.3em] transition-all uppercase ${activeTab === 'files' ? 'text-blue-500 bg-white/5 shadow-[inset_0_-3px_0_#3b82f6]' : 'text-gray-500 hover:text-gray-300'}`}>Paketler</button>
+         <button onClick={() => setActiveTab('bank')} className={`flex-1 py-6 font-black text-xs tracking-[0.3em] transition-all uppercase ${activeTab === 'bank' ? 'text-green-500 bg-white/5 shadow-[inset_0_-3px_0_#22c55e]' : 'text-gray-500 hover:text-gray-300'}`}>Banka</button>
        </div>
 
-       <div className="flex-1 overflow-y-auto p-6 z-10">
-          {message && <div className="bg-blue-600 p-2 text-center rounded mb-4 animate-bounce">{message}</div>}
+       <div className="flex-1 overflow-y-auto p-10 z-10 custom-scrollbar">
+          {message && <div className="bg-blue-600/20 text-blue-400 border border-blue-500/30 p-5 text-center rounded-2xl mb-10 animate-pulse font-bold tracking-widest uppercase text-xs">{message}</div>}
 
           {activeTab === 'themes' && (
-             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {THEMES.map(theme => {
                    const owned = userProfile.inventory.includes(theme.id);
                    const active = userProfile.activeTheme === theme.id;
                    return (
-                      <div key={theme.id} className="p-4 border border-white/10 bg-black/40 rounded flex flex-col justify-between hover:bg-white/5 transition-colors">
+                      <div key={theme.id} className="group p-8 border border-white/10 bg-black/60 rounded-[2rem] flex flex-col justify-between hover:bg-white/5 transition-all hover:scale-[1.03] hover:border-white/30 shadow-2xl relative overflow-hidden">
+                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
                          <div>
-                            <h3 className={`text-xl font-bold ${theme.fontClass}`}>{theme.name}</h3>
-                            <div className={`mt-2 h-12 w-full ${theme.bgClass} border ${theme.accentClass} shadow-lg`}></div>
+                            <h3 className={`text-2xl font-black mb-6 ${theme.fontClass} tracking-tighter`}>{theme.name}</h3>
+                            <div className={`h-28 w-full ${theme.bgClass} border-2 ${theme.accentClass} rounded-2xl shadow-inner relative overflow-hidden`}>
+                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                               <div className="absolute inset-4 border border-white/5 rounded-lg"></div>
+                            </div>
                          </div>
-                         <div className="mt-4">
-                            {active ? <button disabled className="w-full py-2 bg-green-800 text-green-200 font-bold border border-green-600">AKTİF</button> 
-                            : owned ? <button onClick={() => handleEquipTheme(theme.id)} className="w-full py-2 bg-white text-black font-bold hover:bg-gray-200">KUŞAN</button>
-                            : <button onClick={() => handleBuyTheme(theme)} className="w-full py-2 bg-yellow-600 text-black font-bold hover:bg-yellow-500">SATIN AL ${theme.price}</button>}
+                         <div className="mt-8">
+                            {active ? <button disabled className="w-full py-4 bg-green-500/10 text-green-500 font-black border border-green-500/30 rounded-xl tracking-widest text-xs uppercase">Aktif</button> 
+                            : owned ? <button onClick={() => handleEquipTheme(theme.id)} className="w-full py-4 bg-white text-black font-black hover:bg-blue-500 hover:text-white rounded-xl transition-all tracking-widest text-xs uppercase shadow-xl">Kuşan</button>
+                            : <button onClick={() => handleBuyTheme(theme)} className="w-full py-4 bg-yellow-600 hover:bg-yellow-500 text-black font-black rounded-xl transition-all tracking-widest text-xs uppercase shadow-xl">Satın Al (${theme.price})</button>}
                          </div>
                       </div>
                    )
@@ -141,87 +124,74 @@ const ShopView: React.FC<ShopProps> = ({ userProfile, setUserProfile, onBack }) 
           )}
 
           {activeTab === 'files' && (
-             <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-black/40 border-2 border-blue-500 p-6 rounded-xl">
-                   <h3 className="text-2xl font-bold text-blue-400 mb-2">GİZLİ GÖREVLER</h3>
-                   <p className="text-gray-400 mb-4">İçerik: 20 Ekstra Zorlu Seviye. Yeni Modüller.</p>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl mx-auto">
+                <div className="bg-gradient-to-br from-blue-900/40 to-black border-2 border-blue-500/20 p-10 rounded-[2.5rem] hover:border-blue-500 transition-all group shadow-2xl relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-10 opacity-5 text-8xl font-black">FILES</div>
+                   <h3 className="text-4xl font-black text-blue-400 mb-6 group-hover:scale-105 transition-transform origin-left tracking-tighter uppercase">Gizli Görevler</h3>
+                   <p className="text-gray-400 mb-10 leading-relaxed text-sm font-medium">20 adet yüksek riskli operasyon. Yeni nesil şifreleme modülleri ve kısıtlı süreli görevler ile yeteneklerini sına.</p>
                    {userProfile.ownedPacks.includes('covert_ops') ? (
-                      <div className="text-green-500 font-bold border border-green-500 p-2 text-center">SATIN ALINDI</div>
+                      <div className="text-green-500 font-black border-2 border-green-500/30 bg-green-500/5 p-5 text-center rounded-2xl uppercase tracking-[0.3em] text-xs">Erişim Onaylandı</div>
                    ) : (
-                      <button onClick={() => handleBuyPack('covert_ops', 5000, 'Gizli Görevler')} className="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded">SATIN AL ($5,000)</button>
+                      <button onClick={() => handleBuyPack('covert_ops', 5000, 'Gizli Görevler')} className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-2xl shadow-2xl transition-all active:scale-95 uppercase tracking-[0.2em] text-sm">Klasörü Aç ($5,000)</button>
                    )}
                 </div>
 
-                <div className="bg-black/40 border-2 border-red-600 p-6 rounded-xl">
-                   <h3 className="text-2xl font-bold text-red-500 mb-2">KABUS MODU</h3>
-                   <p className="text-gray-400 mb-4">İçerik: 15 İmkansız Seviye. Süre Çok Kısıtlı.</p>
+                <div className="bg-gradient-to-br from-red-900/40 to-black border-2 border-red-600/20 p-10 rounded-[2.5rem] hover:border-red-600 transition-all group shadow-2xl relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-10 opacity-5 text-8xl font-black text-red-500">DANGER</div>
+                   <h3 className="text-4xl font-black text-red-500 mb-6 group-hover:scale-105 transition-transform origin-left tracking-tighter uppercase">Kabus Modu</h3>
+                   <p className="text-gray-400 mb-10 leading-relaxed text-sm font-medium">15 adet imkansız seviyede operasyon. Hataların telafisi yoktur. Sadece en profesyonel ajanlar için.</p>
                    {userProfile.ownedPacks.includes('nightmare') ? (
-                      <div className="text-green-500 font-bold border border-green-500 p-2 text-center">SATIN ALINDI</div>
+                      <div className="text-green-500 font-black border-2 border-green-500/30 bg-green-500/5 p-5 text-center rounded-2xl uppercase tracking-[0.3em] text-xs">Erişim Onaylandı</div>
                    ) : (
-                      <button onClick={() => handleBuyPack('nightmare', 15000, 'Kabus Modu')} className="w-full py-3 bg-red-600 hover:bg-red-500 font-bold rounded">SATIN AL ($15,000)</button>
+                      <button onClick={() => handleBuyPack('nightmare', 15000, 'Kabus Modu')} className="w-full py-5 bg-red-600 hover:bg-red-500 text-white font-black rounded-2xl shadow-2xl transition-all active:scale-95 uppercase tracking-[0.2em] text-sm">Klasörü Aç ($15,000)</button>
                    )}
                 </div>
              </div>
           )}
 
           {activeTab === 'bank' && (
-             <div className="space-y-8">
-                 {/* IAP Section */}
+             <div className="space-y-14 max-w-6xl mx-auto">
                  <div>
-                    <h3 className="text-xl font-bold mb-4 text-green-400 border-b border-green-800 pb-2">HESABA PARA YÜKLE</h3>
-                    <div className="grid md:grid-cols-3 gap-6">
-                        <button onClick={() => buyMoney(10000, '19.99 TL')} className="bg-gradient-to-br from-green-900 to-black border border-green-600 p-6 rounded hover:scale-105 transition-transform group">
-                            <div className="text-3xl mb-1">💰</div>
-                            <div className="text-2xl font-bold text-white">$10,000</div>
-                            <div className="text-sm text-green-400 mt-2 bg-black/50 py-1 rounded">19.99 TL</div>
+                    <h3 className="text-2xl font-black mb-8 text-green-400 border-b border-green-800 pb-4 flex items-center gap-4 uppercase tracking-tighter">
+                       <span className="text-3xl">🏦</span> Operasyon Fonu Tedariği
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <button onClick={() => buyMoney(10000, '19.99 TL')} className="bg-black/60 border border-green-500/20 p-10 rounded-3xl hover:scale-105 transition-all group hover:border-green-500 shadow-xl">
+                            <div className="text-5xl mb-6">💰</div>
+                            <div className="text-4xl font-black text-white">$10,000</div>
+                            <div className="text-[10px] text-green-500 mt-6 font-black bg-green-500/5 py-2 rounded-lg tracking-widest uppercase">19.99 TL</div>
                         </button>
-                        <button onClick={() => buyMoney(50000, '49.99 TL')} className="bg-gradient-to-br from-blue-900 to-black border border-blue-600 p-6 rounded hover:scale-105 transition-transform group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 bg-yellow-500 text-black text-xs font-bold px-2 py-1">POPÜLER</div>
-                            <div className="text-3xl mb-1">💎</div>
-                            <div className="text-2xl font-bold text-white">$50,000</div>
-                            <div className="text-sm text-blue-400 mt-2 bg-black/50 py-1 rounded">49.99 TL</div>
+                        <button onClick={() => buyMoney(50000, '49.99 TL')} className="bg-black/60 border border-blue-500/20 p-10 rounded-3xl hover:scale-105 transition-all group hover:border-blue-500 relative shadow-2xl">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-500 text-black text-[9px] font-black px-6 py-2 rounded-full uppercase tracking-widest shadow-lg">Popüler Seçim</div>
+                            <div className="text-5xl mb-6">💎</div>
+                            <div className="text-4xl font-black text-white">$50,000</div>
+                            <div className="text-[10px] text-blue-400 mt-6 font-black bg-blue-500/5 py-2 rounded-lg tracking-widest uppercase">49.99 TL</div>
                         </button>
-                        <button onClick={() => buyMoney(250000, '199.99 TL')} className="bg-gradient-to-br from-purple-900 to-black border border-purple-600 p-6 rounded hover:scale-105 transition-transform group relative overflow-hidden">
-                            <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-2 py-1">EN İYİ FİYAT</div>
-                            <div className="text-3xl mb-1">👑</div>
-                            <div className="text-2xl font-bold text-white">$250,000</div>
-                            <div className="text-sm text-purple-400 mt-2 bg-black/50 py-1 rounded">199.99 TL</div>
-                        </button>
-                        <button onClick={() => buyMoney(1000000, '499.99 TL')} className="bg-gradient-to-br from-yellow-900 to-black border border-yellow-600 p-6 rounded hover:scale-105 transition-transform group col-span-full md:col-span-3">
-                            <div className="text-4xl mb-1">🏆</div>
-                            <div className="text-3xl font-bold text-yellow-500">HAZİNE SANDIĞI ($1M)</div>
-                            <div className="text-lg text-yellow-200 mt-2 bg-black/50 py-1 rounded w-1/3 mx-auto">499.99 TL</div>
+                        <button onClick={() => buyMoney(250000, '199.99 TL')} className="bg-black/60 border border-purple-500/20 p-10 rounded-3xl hover:scale-105 transition-all group hover:border-purple-500 shadow-xl">
+                            <div className="text-5xl mb-6">👑</div>
+                            <div className="text-4xl font-black text-white">$250,000</div>
+                            <div className="text-[10px] text-purple-400 mt-6 font-black bg-purple-500/5 py-2 rounded-lg tracking-widest uppercase">199.99 TL</div>
                         </button>
                     </div>
                  </div>
 
-                 {/* Promo Section */}
-                 <div>
-                    <h3 className="text-xl font-bold mb-4 text-gray-400 border-b border-gray-700 pb-2">PROMOSYON</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div className="bg-zinc-800 p-6 rounded border border-zinc-600">
-                            <div className="text-xs text-gray-400 mb-2">HEDİYE KODU KULLAN</div>
-                            <div className="flex gap-2">
+                 <div className="bg-white/5 p-10 rounded-[2.5rem] border border-white/10 shadow-2xl backdrop-blur-md">
+                    <h3 className="text-2xl font-black mb-8 text-gray-400 flex items-center gap-4 uppercase tracking-tighter">
+                       <span className="text-3xl">🎟️</span> Yetkilendirme Kodları
+                    </h3>
+                    <div className="flex flex-col md:flex-row gap-10">
+                        <div className="flex-1 bg-black/60 p-8 rounded-3xl border border-white/5">
+                            <div className="text-[10px] text-gray-500 mb-4 font-black uppercase tracking-[0.3em]">Güvenlik Kodu</div>
+                            <div className="flex gap-4">
                                 <input 
                                     value={promoCode} 
                                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                                    placeholder="KOD GİRİN" 
-                                    className="bg-black border border-gray-600 p-2 w-full text-white text-sm focus:border-yellow-500 outline-none"
+                                    placeholder="KODU GİRİN" 
+                                    className="bg-black/80 border border-white/10 p-5 flex-1 text-white text-sm focus:border-yellow-500 outline-none rounded-2xl font-mono tracking-widest shadow-inner"
                                 />
-                                <button onClick={redeemCode} className="bg-yellow-600 text-black font-bold px-4 hover:bg-yellow-500">OK</button>
+                                <button onClick={redeemCode} className="bg-yellow-600 text-black font-black px-10 hover:bg-yellow-500 transition-all rounded-2xl uppercase text-xs tracking-widest shadow-xl active:scale-95">Onayla</button>
                             </div>
                         </div>
-
-                        {/* Exit Developer Mode Button */}
-                        {userProfile.isDevMode && (
-                        <button onClick={handleExitDevMode} className="bg-red-950/80 border border-red-600 p-6 rounded hover:bg-red-900 flex flex-row items-center justify-center gap-4 group transition-all">
-                            <div className="text-4xl group-hover:scale-110 transition-transform">🚫</div>
-                            <div className="text-left">
-                                <div className="font-bold text-red-500 text-lg">GELİŞTİRİCİ MODU</div>
-                                <div className="text-red-300 text-xs">Modu kapat ve normal bakiyeye dön.</div>
-                            </div>
-                        </button>
-                        )}
                     </div>
                  </div>
              </div>

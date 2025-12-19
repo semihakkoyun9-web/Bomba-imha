@@ -109,9 +109,13 @@ const DefuserView: React.FC<DefuserViewProps> = ({
     };
 
     if (isWin) {
+       // Standard calculation
        const baseReward = 50 + (bomb.level * 10);
        const timeBonus = bomb.timeLeft * 2;
-       newProfile.money += baseReward + timeBonus;
+       // Added +$20 FIXED BONUS for every victory
+       const fixedBonus = 20; 
+       
+       newProfile.money += baseReward + timeBonus + fixedBonus;
        newProfile.gamesWon += 1;
        
        const levelKey = `${packId}_${level}`;
@@ -139,7 +143,6 @@ const DefuserView: React.FC<DefuserViewProps> = ({
     });
   }, [userProfile, handleGameEnd]);
 
-  // --- Handlers ---
   const handleCutWire = (modIndex: number, wireIndex: number) => { 
      setBomb(prev => {
       if (!prev) return null;
@@ -159,6 +162,7 @@ const DefuserView: React.FC<DefuserViewProps> = ({
       }
     });
   };
+
   const handleWordPress = (i: number, l: string) => {
     setBomb(prev => {
         if(!prev) return null; const mod = prev.modules[i]; if(mod.solved) return prev;
@@ -167,6 +171,7 @@ const DefuserView: React.FC<DefuserViewProps> = ({
         } else { handleStrike(); const nm = [...prev.modules]; nm[i] = {...mod, data: generateWordModule(i)}; return {...prev, modules:nm}; }
     });
   };
+
   const handleKeypadPress = (i: number, s: string) => {
       setBomb(prev => {
           if(!prev) return null; const mod = prev.modules[i]; if(mod.solved) return prev;
@@ -178,6 +183,7 @@ const DefuserView: React.FC<DefuserViewProps> = ({
           } else { handleStrike(); const nm = [...prev.modules]; nm[i] = {...mod, data: {...mod.data, pressed: []}}; return {...prev, modules:nm}; }
       });
   };
+
   const handleButton = (i: number, start: boolean) => {
       setBomb(prev => {
           if(!prev) return null; const mod = prev.modules[i]; if(mod.solved) return prev;
@@ -191,8 +197,6 @@ const DefuserView: React.FC<DefuserViewProps> = ({
       });
   };
 
-  // --- LOGIC IMPLEMENTED ---
-  
   const handleSimonPress = (modIndex: number, color: string) => {
     setBomb(prev => {
       if(!prev) return null; const mod = prev.modules[modIndex];
@@ -202,22 +206,17 @@ const DefuserView: React.FC<DefuserViewProps> = ({
       
       if(color === correctColor) {
         if(newInputSeq.length === mod.data.stage + 1) {
-           // Stage Complete
            if(mod.data.stage + 1 === mod.data.sequence.length) {
-              // Module Solved
               nm[modIndex] = {...mod, solved:true, data: {...mod.data, inputSequence: newInputSeq}};
            } else {
-              // Advance Stage, Clear Input
               nm[modIndex] = {...mod, data: {...mod.data, stage: mod.data.stage + 1, inputSequence: []}};
            }
         } else {
-           // Correct input, wait for next
            nm[modIndex] = {...mod, data: {...mod.data, inputSequence: newInputSeq}};
         }
       } else {
-        // WRONG INPUT
         handleStrike();
-        nm[modIndex] = {...mod, data: {...mod.data, inputSequence: []}}; // Reset input for current stage
+        nm[modIndex] = {...mod, data: {...mod.data, inputSequence: []}};
       }
       return {...prev, modules:nm};
     });
@@ -300,16 +299,10 @@ const DefuserView: React.FC<DefuserViewProps> = ({
          if(!prev) return null; const mod = prev.modules[modIndex];
          const current = mod.data.currentPos;
          const next = { x: current.x + dir.x, y: current.y + dir.y };
-         
-         // 1. Boundary Check
          if(next.x < 0 || next.x > 5 || next.y < 0 || next.y > 5) { handleStrike(); return prev; }
-         
-         // 2. Wall Collision Check
          if(checkMazeCollision(current, next, mod.data.walls)) {
              handleStrike(); return prev;
          }
-
-         // 3. Move Logic
          if(next.x === mod.data.endPos.x && next.y === mod.data.endPos.y) {
              const nm = [...prev.modules]; nm[modIndex] = {...mod, data: {...mod.data, currentPos: next}, solved:true}; return {...prev, modules:nm};
          }
@@ -330,68 +323,70 @@ const DefuserView: React.FC<DefuserViewProps> = ({
     });
   };
 
-  if (!bomb) return <div className="text-white p-10">Bomba Hazırlanıyor...</div>;
+  if (!bomb) return <div className="text-white p-10 flex items-center justify-center min-h-screen mono animate-pulse uppercase tracking-[0.5em]">Establishing Connection...</div>;
 
   return (
     <div className={`flex flex-col items-center justify-center min-h-screen p-4 ${activeThemeData.bgClass} relative transition-colors duration-500`}>
       <div className="scanline"></div>
       
-      {/* HUD */}
-      <div className="w-full max-w-4xl flex justify-between items-start mb-4 z-20">
-        <button onClick={() => setGameState(GameState.MENU)} className="bg-red-900/50 text-red-200 border border-red-500 px-3 py-1 rounded hover:bg-red-800 text-sm">
-          &lt; TESLİM OL
+      <div className="w-full max-w-4xl flex justify-between items-center mb-6 z-20 bg-black/60 p-5 rounded-3xl border border-white/5 backdrop-blur-2xl relative">
+        <div className="hud-corner corner-tl"></div>
+        <div className="hud-corner corner-tr"></div>
+        <button onClick={() => setGameState(GameState.MENU)} className="bg-red-600/10 text-red-500 border border-red-500/20 px-6 py-2 rounded-xl hover:bg-red-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest shadow-lg">
+          Terminate Mission
         </button>
-        <div className="text-right">
-           <div className={`text-xl font-bold ${activeThemeData.fontClass}`}>LEVEL {level}</div>
-           <div className="text-xs text-white/50">{bomb.serialOdd ? 'S/N: ODD-591' : 'S/N: EVN-240'}</div>
-           <div className="text-xs text-white/50 flex gap-2 justify-end">
-              {bomb.hasBatteries && <span>[BATT]</span>}
-              {bomb.hasParallelPort && <span>[PAR]</span>}
-              {bomb.hasIndicator && <span>[IND]</span>}
-           </div>
+        <div className="text-center">
+           <div className={`text-2xl font-black ${activeThemeData.fontClass} tracking-tighter uppercase`}>Sector {level}</div>
+           <div className="text-[9px] text-white/40 mono tracking-[0.3em] uppercase">Status: Armed</div>
+        </div>
+        <div className="flex gap-2">
+           {bomb.hasBatteries && <span className="bg-blue-600/20 text-blue-400 text-[9px] px-3 py-1 rounded-lg border border-blue-500/20 font-black uppercase">PWR</span>}
+           {bomb.hasParallelPort && <span className="bg-emerald-600/20 text-emerald-400 text-[9px] px-3 py-1 rounded-lg border border-emerald-500/20 font-black uppercase">LINK</span>}
         </div>
       </div>
 
-      <div className="w-full max-w-2xl flex justify-between items-end mb-6 z-20">
-        <div className="flex gap-2">
+      <div className="w-full max-w-3xl flex justify-between items-center mb-8 z-20 px-4">
+        <div className="flex gap-4">
           {Array.from({ length: bomb.maxStrikes }).map((_, i) => (
-            <div key={i} className={`w-8 h-8 rounded-full border-2 border-red-900 flex items-center justify-center ${i < bomb.strikes ? 'bg-red-600 animate-pulse' : 'bg-black'}`}>X</div>
+            <div key={i} className={`w-14 h-14 rounded-2xl border-2 border-red-600/20 flex items-center justify-center transition-all ${i < bomb.strikes ? 'bg-red-600 shadow-[0_0_25px_rgba(220,38,38,0.5)] scale-110' : 'bg-black/60'}`}>
+               <span className={`text-3xl font-black ${i < bomb.strikes ? 'text-white' : 'text-red-900/10'}`}>X</span>
+            </div>
           ))}
         </div>
         <Timer seconds={bomb.timeLeft} />
       </div>
 
-      <div className={`${activeThemeData.panelClass} p-4 md:p-8 rounded-xl shadow-2xl border-4 ${activeThemeData.accentClass} z-20 max-w-6xl w-full max-h-[70vh] overflow-y-auto`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className={`${activeThemeData.panelClass} p-4 md:p-12 rounded-[3rem] shadow-[0_0_150px_rgba(0,0,0,0.8)] border-2 border-white/5 z-20 max-w-7xl w-full max-h-[75vh] overflow-y-auto custom-scrollbar relative`}>
+        <div className="hud-corner corner-tl"></div>
+        <div className="hud-corner corner-tr"></div>
+        <div className="hud-corner corner-bl"></div>
+        <div className="hud-corner corner-br"></div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
           {bomb.modules.map((mod, index) => {
             switch(mod.type) {
               case ModuleType.WIRES: return <WireModule key={index} wires={mod.data} onCut={(i) => handleCutWire(index, i)} solved={mod.solved} />;
               case ModuleType.WORDS: return <WordModule key={index} data={mod.data} onPress={(l) => handleWordPress(index, l)} solved={mod.solved} />;
               case ModuleType.KEYPAD: return <KeypadModule key={index} data={mod.data} onPress={(s) => handleKeypadPress(index, s)} solved={mod.solved} />;
               case ModuleType.BUTTON: return <ButtonModule key={index} data={mod.data} onPressStart={() => handleButton(index, true)} onPressEnd={() => handleButton(index, false)} solved={mod.solved} />;
-              
               case ModuleType.SIMON: return <SimonModule key={index} data={mod.data} onPress={(c) => handleSimonPress(index, c)} solved={mod.solved} strikes={bomb.strikes} />;
-              
               case ModuleType.MORSE: return <MorseModule key={index} data={mod.data} onSolve={(f) => handleMorseSolve(index, f)} solved={mod.solved} />;
-              
               case ModuleType.PASSWORD: return <PasswordModule key={index} data={mod.data} onChangeIndex={(c, d) => handlePasswordChange(index, c, d)} onSubmit={() => handlePasswordSubmit(index)} solved={mod.solved} />;
-              
               case ModuleType.COMPLEX_WIRES:
                 return (
-                   <div key={index} className="bg-zinc-300 p-2 rounded border-2 border-zinc-500 relative">
-                      <div className={`absolute top-1 right-1 w-3 h-3 rounded-full ${mod.solved ? 'bg-green-500' : 'bg-black'}`}></div>
-                      <h4 className="text-xs font-bold mb-2 text-black border-b border-black">M: KARMAŞIK</h4>
-                      <div className="flex justify-around h-32">
+                   <div key={index} className="bg-zinc-800/80 p-6 rounded-3xl border border-white/10 relative shadow-2xl backdrop-blur-md">
+                      <div className={`absolute top-4 right-4 w-5 h-5 rounded-full border-2 border-black/20 ${mod.solved ? 'bg-blue-500 shadow-[0_0_15px_#3b82f6]' : 'bg-black/60'}`}></div>
+                      <h4 className="text-[9px] font-black mb-6 text-white/30 border-b border-white/5 pb-2 uppercase tracking-[0.3em]">Complex Bus</h4>
+                      <div className="flex justify-around h-40">
                         {mod.data.map((w: any, idx: number) => (
-                           <div key={idx} className="flex flex-col items-center justify-between h-full">
-                              <div className={`w-2 h-2 rounded-full ${w.isLedOn ? 'bg-green-500 shadow-[0_0_5px_lime]' : 'bg-black/20'}`}></div>
-                              {w.hasStar && <span className="text-black text-xs">★</span>}
+                           <div key={idx} className="flex flex-col items-center justify-between h-full bg-black/20 p-1 rounded-full border border-white/5">
+                              <div className={`w-2 h-2 rounded-full ${w.isLedOn ? 'bg-blue-400 shadow-[0_0_10px_#60a5fa]' : 'bg-black/40'}`}></div>
+                              {w.hasStar && <span className="text-white/40 text-[9px] font-bold">★</span>}
                               <button 
                                 onClick={() => handleComplexCut(index, idx)} disabled={mod.solved || w.isCut}
-                                className={`w-2 h-full ${w.isCut ? 'border-dashed border-2 border-black bg-transparent' : ''}`}
-                                style={{ backgroundColor: w.isCut ? 'transparent' : (w.color.red && w.color.blue ? 'purple' : w.color.red ? 'red' : w.color.blue ? 'blue' : 'white'), border: w.isCut ? 'none' : '1px solid gray' }}
+                                className={`w-3 h-full rounded-full transition-all ${w.isCut ? 'opacity-20 bg-transparent border border-dashed border-white/20' : 'shadow-xl active:scale-90 hover:brightness-125'}`}
+                                style={{ backgroundColor: w.isCut ? 'transparent' : (w.color.red && w.color.blue ? '#7e22ce' : w.color.red ? '#dc2626' : w.color.blue ? '#2563eb' : '#eee') }}
                               ></button>
-                              {w.isCut && <div className="w-full h-1 bg-black"></div>}
                            </div>
                         ))}
                       </div>
@@ -399,58 +394,54 @@ const DefuserView: React.FC<DefuserViewProps> = ({
                 );
               case ModuleType.VENTING:
                 return (
-                   <div key={index} className="bg-zinc-800 p-4 rounded border-2 border-yellow-600 relative">
-                      <div className={`absolute top-1 right-1 w-3 h-3 rounded-full ${mod.solved ? 'bg-green-500' : 'bg-black'}`}></div>
-                      <div className="text-yellow-500 font-mono text-center mb-2">{mod.data.question}</div>
-                      <div className="flex gap-2">
-                         <button onClick={() => handleVentingAnswer(index, 'EVET')} className="flex-1 bg-gray-200 rounded p-1 font-bold hover:bg-white">E</button>
-                         <button onClick={() => handleVentingAnswer(index, 'HAYIR')} className="flex-1 bg-gray-200 rounded p-1 font-bold hover:bg-white">H</button>
+                   <div key={index} className="bg-zinc-900 p-8 rounded-3xl border border-yellow-500/20 relative shadow-2xl overflow-hidden backdrop-blur-md">
+                      <div className="absolute top-0 left-0 w-full h-[2px] bg-yellow-500/30"></div>
+                      <div className="text-yellow-500/80 mono text-center mb-8 text-2xl tracking-[0.2em]">{mod.data.question}</div>
+                      <div className="flex gap-4">
+                         <button onClick={() => handleVentingAnswer(index, 'EVET')} className="flex-1 bg-white/5 border border-white/10 rounded-2xl py-5 text-white font-black hover:bg-yellow-500 hover:text-black transition-all shadow-xl active:scale-95 text-xs uppercase tracking-widest">Confirm</button>
+                         <button onClick={() => handleVentingAnswer(index, 'HAYIR')} className="flex-1 bg-white/5 border border-white/10 rounded-2xl py-5 text-white font-black hover:bg-red-600 hover:text-black transition-all shadow-xl active:scale-95 text-xs uppercase tracking-widest">Deny</button>
                       </div>
                    </div>
                 );
               case ModuleType.MAZE:
                 return (
-                  <div key={index} className="bg-zinc-200 p-2 rounded border-2 border-zinc-500 relative">
-                     <div className={`absolute top-1 right-1 w-3 h-3 rounded-full ${mod.solved ? 'bg-green-500' : 'bg-black'}`}></div>
-                     <div className="grid grid-cols-6 gap-1 w-32 mx-auto">
+                  <div key={index} className="bg-zinc-800/80 p-6 rounded-3xl border border-white/10 relative shadow-2xl backdrop-blur-md">
+                     <h4 className="text-[9px] font-black mb-6 text-white/30 border-b border-white/5 pb-2 uppercase tracking-[0.3em]">Geo Nav</h4>
+                     <div className="grid grid-cols-6 gap-1 w-48 mx-auto bg-black/40 p-2 rounded-2xl border border-white/5">
                         {Array.from({length:36}).map((_, i) => {
                             const x = i % 6; const y = Math.floor(i / 6);
                             const isPlayer = x === mod.data.currentPos.x && y === mod.data.currentPos.y;
                             const isEnd = x === mod.data.endPos.x && y === mod.data.endPos.y;
-                            // Check if this cell is a marker
                             const isMarker = mod.data.markers.some((m: any) => m.x === x && m.y === y);
-
                             return (
-                               <div key={i} className={`w-4 h-4 border border-gray-300 relative ${isPlayer ? 'bg-red-500' : isEnd ? 'bg-green-500' : 'bg-white'}`}>
-                                  {isMarker && !isPlayer && !isEnd && <div className="absolute inset-0 m-auto w-2 h-2 rounded-full border border-green-700"></div>}
+                               <div key={i} className={`w-7 h-7 border border-white/5 relative rounded-lg transition-colors ${isPlayer ? 'bg-blue-500 shadow-[0_0_15px_#3b82f6] z-10' : isEnd ? 'bg-emerald-500/50' : 'bg-white/5'}`}>
+                                  {isMarker && !isPlayer && !isEnd && <div className="absolute inset-0 m-auto w-3 h-3 rounded-full border border-emerald-500/50"></div>}
                                </div>
                             )
                         })}
                      </div>
-                     <div className="grid grid-cols-3 gap-1 mt-2 w-20 mx-auto">
-                        <div></div><button onClick={() => handleMazeMove(index, {x:0,y:-1})} className="bg-gray-400 p-1 rounded hover:bg-white">^</button><div></div>
-                        <button onClick={() => handleMazeMove(index, {x:-1,y:0})} className="bg-gray-400 p-1 rounded hover:bg-white">&lt;</button>
-                        <button onClick={() => handleMazeMove(index, {x:0,y:1})} className="bg-gray-400 p-1 rounded hover:bg-white">v</button>
-                        <button onClick={() => handleMazeMove(index, {x:1,y:0})} className="bg-gray-400 p-1 rounded hover:bg-white">&gt;</button>
+                     <div className="grid grid-cols-3 gap-2 mt-8 w-40 mx-auto">
+                        <div></div><button onClick={() => handleMazeMove(index, {x:0,y:-1})} className="bg-white/5 border border-white/10 text-white rounded-xl p-3 hover:bg-white hover:text-black transition-all shadow-lg active:scale-90">▲</button><div></div>
+                        <button onClick={() => handleMazeMove(index, {x:-1,y:0})} className="bg-white/5 border border-white/10 text-white rounded-xl p-3 hover:bg-white hover:text-black transition-all shadow-lg active:scale-90">◀</button>
+                        <button onClick={() => handleMazeMove(index, {x:0,y:1})} className="bg-white/5 border border-white/10 text-white rounded-xl p-3 hover:bg-white hover:text-black transition-all shadow-lg active:scale-90">▼</button>
+                        <button onClick={() => handleMazeMove(index, {x:1,y:0})} className="bg-white/5 border border-white/10 text-white rounded-xl p-3 hover:bg-white hover:text-black transition-all shadow-lg active:scale-90">▶</button>
                      </div>
                   </div>
                 );
               case ModuleType.KNOB:
                  return (
-                   <div key={index} className="bg-zinc-400 p-4 rounded border-2 border-zinc-600 relative flex flex-col items-center">
-                      <div className={`absolute top-1 right-1 w-3 h-3 rounded-full ${mod.solved ? 'bg-green-500' : 'bg-black'}`}></div>
-                      <div className="grid grid-cols-6 gap-1 mb-4">
+                   <div key={index} className="bg-zinc-800/80 p-8 rounded-3xl border border-white/10 relative flex flex-col items-center shadow-2xl backdrop-blur-md">
+                      <div className="grid grid-cols-6 gap-3 mb-8">
                         {mod.data.leds.map((on: boolean, i: number) => (
-                           <div key={i} className={`w-3 h-3 rounded-full ${on ? 'bg-yellow-400 shadow-[0_0_5px_yellow]' : 'bg-gray-700'}`}></div>
+                           <div key={i} className={`w-3 h-3 rounded-full border border-white/5 transition-all duration-300 ${on ? 'bg-blue-400 shadow-[0_0_10px_#60a5fa]' : 'bg-black/40'}`}></div>
                         ))}
                       </div>
-                      <div className="relative w-24 h-24 bg-zinc-800 rounded-full border-4 border-zinc-600 flex items-center justify-center">
-                         <div className="text-white text-xs">ANAHTAR</div>
-                         {/* Arrows */}
-                         <button onClick={() => handleKnobRotate(index, 'UP')} className="absolute top-0 w-8 h-8 bg-gray-600/50 hover:bg-white/20 rounded-t-full text-white">▲</button>
-                         <button onClick={() => handleKnobRotate(index, 'RIGHT')} className="absolute right-0 w-8 h-8 bg-gray-600/50 hover:bg-white/20 rounded-r-full text-white">▶</button>
-                         <button onClick={() => handleKnobRotate(index, 'DOWN')} className="absolute bottom-0 w-8 h-8 bg-gray-600/50 hover:bg-white/20 rounded-b-full text-white">▼</button>
-                         <button onClick={() => handleKnobRotate(index, 'LEFT')} className="absolute left-0 w-8 h-8 bg-gray-600/50 hover:bg-white/20 rounded-l-full text-white">◀</button>
+                      <div className="relative w-44 h-44 bg-black/40 rounded-full border-4 border-white/5 flex items-center justify-center shadow-inner group">
+                         <div className="text-white/20 text-[8px] font-black uppercase tracking-[0.4em]">Rotary</div>
+                         <button onClick={() => handleKnobRotate(index, 'UP')} className="absolute top-0 w-20 h-14 bg-white/5 hover:bg-white/10 rounded-t-full text-white transition-all text-xs">▲</button>
+                         <button onClick={() => handleKnobRotate(index, 'RIGHT')} className="absolute right-0 w-14 h-20 bg-white/5 hover:bg-white/10 rounded-r-full text-white transition-all text-xs">▶</button>
+                         <button onClick={() => handleKnobRotate(index, 'DOWN')} className="absolute bottom-0 w-20 h-14 bg-white/5 hover:bg-white/10 rounded-b-full text-white transition-all text-xs">▼</button>
+                         <button onClick={() => handleKnobRotate(index, 'LEFT')} className="absolute left-0 w-14 h-20 bg-white/5 hover:bg-white/10 rounded-l-full text-white transition-all text-xs">◀</button>
                       </div>
                    </div>
                  );
